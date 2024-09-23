@@ -1,37 +1,73 @@
-import express, { Request, Response } from "express";
-import Post from "../models/Post";
+import express from 'express';
+import {
+  createPost,
+  getAllPosts,
+  getPostById,
+  updatePost,
+  deletePost,
+} from '../services/posts';
 
 const router = express.Router();
 
-router.get("/", async (req: Request, res: Response) => {
+// Create a new post
+router.post('/', async (req, res) => {
   try {
-    const posts = await Post.find();
-    res.json(posts);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(`Error: ${error.message}`);
-    } else {
-      console.error("An unknown error occurred");
-    }
+    const post = await createPost(req.body);
+    res.status(201).json(post);
+  } catch (err) {
+    res.status(500).json({ message: 'Error creating post' });
   }
 });
 
-router.post("/", async (req: Request, res: Response) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content,
-    author: req.body.author,
-  });
-
+// Get all posts
+router.get('/', async (req, res) => {
   try {
-    const newPost = await post.save();
-    res.status(201).json(newPost);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(`Error: ${error.message}`);
+    const posts = await getAllPosts();
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching posts' });
+  }
+});
+
+// Get a single post by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await getPostById(req.params.id);
+    if (post) {
+      res.status(200).json(post);
     } else {
-      console.error("An unknown error occurred");
+      res.status(404).json({ message: 'Post not found' });
     }
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching post' });
+  }
+});
+
+// Update a post by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedPost = await updatePost(req.params.id, req.body);
+    if (updatedPost) {
+      res.status(200).json(updatedPost);
+    } else {
+      res.status(404).json({ message: 'Post not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: 'Error updating post' });
+  }
+});
+
+// Delete a post by ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedPost = await deletePost(req.params.id);
+    if (deletedPost) {
+      res.status(200).json({ message: 'Post deleted successfully' });
+    } else {
+      res.status(404).json({ message: 'Post not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting post' });
   }
 });
 
