@@ -21,7 +21,7 @@ export enum NotificationType {
 // Define Notification Schema
 const NotificationSchema: Schema = new Schema(
   {
-    recipient: { type: Schema.Types.ObjectId, ref: "User", required: true }, // The user receiving the notification
+    recipients: [{ type: Schema.Types.ObjectId, ref: "User", required: true }], // The user receiving the notification
     type: {
       type: NotificationType,
       required: true,
