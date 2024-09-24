@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { registerUser, authUser } from "../controllers/authController";
-import { protect, admin, blogWriter } from "../middlewares/authMiddleware";
+import { protect, admin, blogger } from "../middlewares/authMiddleware";
 
 const router = Router();
 
@@ -9,7 +9,7 @@ router.post("/register", registerUser);
 router.post("/login", authUser);
 
 // Example of protected route for blog writers
-router.get("/writer/posts", protect, blogWriter, (req, res) => {
+router.get("/writer/posts", protect, blogger, (req, res) => {
   res.json({ message: "Blog writer access granted" });
 });
 

@@ -7,10 +7,12 @@ import {
   deleteComment,
 } from "../services/comments";
 
+import { protect, admin, blogger } from "../middlewares/authMiddleware";
+
 const router = express.Router();
 
 // Create a new comment
-router.post("/", async (req, res) => {
+router.post("/", protect, blogger, async (req, res) => {
   try {
     const comment = await createComment(req.body);
     res.status(201).json(comment);
@@ -20,7 +22,7 @@ router.post("/", async (req, res) => {
 });
 
 // Get all comments for a specific post
-router.get("/post/:postId", async (req, res) => {
+router.get("/post/:postId", protect, blogger, async (req, res) => {
   try {
     const comments = await getCommentsByPostId(req.params.postId);
     res.status(200).json(comments);
@@ -30,7 +32,7 @@ router.get("/post/:postId", async (req, res) => {
 });
 
 // Get a single comment by ID
-router.get("/:id", async (req, res) => {
+router.get("/:id", protect, blogger, async (req, res) => {
   try {
     const comment = await getCommentById(req.params.id);
     if (comment) {
@@ -44,7 +46,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Update a comment by ID
-router.put("/:id", async (req, res) => {
+router.put("/:id", protect, blogger, async (req, res) => {
   try {
     const updatedComment = await updateComment(req.params.id, req.body);
     if (updatedComment) {
@@ -58,7 +60,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete a comment by ID
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", protect, blogger, async (req, res) => {
   try {
     const deletedComment = await deleteComment(req.params.id);
     if (deletedComment) {

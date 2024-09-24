@@ -1,25 +1,30 @@
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import dotenv from 'dotenv';
-import User, { IUser } from '../models/User';
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
+import User, { IUser } from "../models/User";
 
 dotenv.config();
 
 // Generate JWT Token
 const generateToken = (id: string, role: string): string => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET as string, { expiresIn: '30d' });
+  return jwt.sign({ id, role }, process.env.JWT_SECRET as string, {
+    expiresIn: "30d",
+  });
 };
 
 // Register new user
-export const registerUser = async (req: Request, res: Response): Promise<void> => {
+export const registerUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { name, email, password, role } = req.body;
 
   try {
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(400).json({ message: 'User already exists' });
+      res.status(400).json({ message: "User already exists" });
       return;
     }
 
@@ -28,7 +33,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       name,
       email,
       password,
-      role
+      role,
     });
 
     // Save user to database
@@ -42,12 +47,15 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       role: user.role,
       likes: user.likes, // Include likes array
       posts: user.posts, // Include posts array
+      followers: user.followers,
+      following: user.following,
+      notifications: user.notifications,
       createdAt: user.createdAt, // Automatically handled by Mongoose
       updatedAt: user.updatedAt, // Automatically handled by Mongoose
-      token: generateToken(user._id, user.role)
+      token: generateToken(user._id, user.role),
     });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -57,7 +65,7 @@ export const authUser = async (req: Request, res: Response): Promise<void> => {
 
   try {
     // Find the user by email
-    const user = await User.findOne({ email }).populate('posts'); // Populate posts created by the user
+    const user = await User.findOne({ email }).populate("posts"); // Populate posts created by the user
 
     if (user && (await user.matchPassword(password))) {
       // Return user data if password matches
@@ -68,14 +76,17 @@ export const authUser = async (req: Request, res: Response): Promise<void> => {
         role: user.role,
         likes: user.likes, // Include likes array
         posts: user.posts, // Include posts array
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        token: generateToken(user._id, user.role)
+        followers: user.followers,
+        following: user.following,
+        notifications: user.notifications,
+        createdAt: user.createdAt, // Automatically handled by Mongoose
+        updatedAt: user.updatedAt, // Automatically handled by Mongoose
+        token: generateToken(user._id, user.role),
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };

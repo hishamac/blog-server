@@ -54,7 +54,7 @@ export const admin = (
 };
 
 // Blog writer role check
-export const blogWriter = (
+export const blogger = (
   req: CustomRequest,
   res: Response,
   next: NextFunction

@@ -12,7 +12,7 @@ connectDB();
 
 app.use(express.json());
 app.use("/api/posts", postRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/comments", commentRoutes);
 
