@@ -1,11 +1,10 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
-// Define an interface for Notification
-interface INotification {
-  type: string; // Type of notification (e.g., "follow", "like", "comment")
-  content: string; // Content of the notification
-  createdAt: Date; // Timestamp for when the notification was created
+// Enum for user roles
+export enum Role {
+  ADMIN = "admin",
+  BLOGGER = "blogger",
 }
 
 // Define an interface for User
@@ -13,20 +12,15 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: string;
+  role: Role;
   likes: number; // Number of posts liked by the user
   posts: mongoose.Schema.Types.ObjectId[]; // Array of Post IDs created by the user
   followers: mongoose.Schema.Types.ObjectId[]; // Array of User IDs following this user
   following: mongoose.Schema.Types.ObjectId[]; // Array of User IDs this user is following
-  notifications: INotification[]; // Array of notifications
+  notifications: mongoose.Schema.Types.ObjectId[]; // Array of notifications
   createdAt: Date;
   updatedAt: Date;
   matchPassword(enteredPassword: string): Promise<boolean>;
-}
-
-export enum Role {
-  ADMIN = "admin",
-  BLOGGER = "blogger",
 }
 
 // Define User Schema
@@ -36,8 +30,9 @@ const UserSchema: Schema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: {
-      type: Role,
-      default: "user",
+      type: String, // Set as String type
+      enum: Object.values(Role), // Use enum to restrict values
+      default: Role.BLOGGER,
     },
     likes: {
       type: Number,

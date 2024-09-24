@@ -1,16 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// Define an interface for Notification
-export interface INotification extends Document {
-  recipients: mongoose.Schema.Types.ObjectId[]; // The user who will receive the notification
-  type: string; // Type of notification (e.g., "like", "comment", "follow")
-  message: string; // Notification message or description
-  post?: string; // Reference to the post, if applicable
-  read: boolean; // Whether the notification has been read
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export enum NotificationType {
   LIKE = "like",
   COMMENT = "comment",
@@ -18,12 +7,24 @@ export enum NotificationType {
   POST = "post",
 }
 
+// Define an interface for Notification
+export interface INotification extends Document {
+  recipients: mongoose.Schema.Types.ObjectId[]; // The user who will receive the notification
+  type: NotificationType; // Type of notification (e.g., "like", "comment", "follow")
+  message: string; // Notification message or description
+  post?: string; // Reference to the post, if applicable
+  read: boolean; // Whether the notification has been read
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Define Notification Schema
 const NotificationSchema: Schema = new Schema(
   {
     recipients: [{ type: Schema.Types.ObjectId, ref: "User", required: true }], // The user receiving the notification
     type: {
-      type: NotificationType,
+      type: String,
+      enum: Object.values(NotificationType),
       required: true,
     },
     message: { type: String, required: true }, // Notification message (e.g., "X liked your post")

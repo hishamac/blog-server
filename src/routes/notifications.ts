@@ -22,7 +22,12 @@ router.post("/", async (req: Request, res: Response) => {
     );
     res.status(201).json(notification);
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err });
+    res
+      .status(500)
+      .json({
+        message: "Server error",
+        error: err instanceof Error ? err.message : err,
+      });
   }
 });
 
@@ -34,7 +39,12 @@ router.get("/:userId", async (req: Request, res: Response) => {
     const notifications = await getUserNotifications(userId);
     res.status(200).json(notifications);
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err });
+    res
+      .status(500)
+      .json({
+        message: "Server error",
+        error: err instanceof Error ? err.message : err,
+      });
   }
 });
 
@@ -53,7 +63,12 @@ router.put("/read/:notificationId", async (req: Request, res: Response) => {
         .json({ message: "Notification not found or user not a recipient" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err });
+    res
+      .status(500)
+      .json({
+        message: "Server error",
+        error: err instanceof Error ? err.message : err,
+      });
   }
 });
 
@@ -65,7 +80,12 @@ router.put("/read-all/:userId", async (req: Request, res: Response) => {
     const result = await markAllAsRead(userId);
     res.status(200).json(result);
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err });
+    res
+      .status(500)
+      .json({
+        message: "Server error",
+        error: err instanceof Error ? err.message : err,
+      });
   }
 });
 

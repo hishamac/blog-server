@@ -61,7 +61,7 @@ export const blogWriter = (
 ): void => {
   if (
     req.user &&
-    (req.user.role === Role.BLOG_WRITER || req.user.role === Role.ADMIN)
+    (req.user.role === Role.BLOGGER || req.user.role === Role.ADMIN)
   ) {
     next();
   } else {
