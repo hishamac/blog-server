@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import connectDB from "./config/database";
 import postRoutes from "./routes/posts";
 import userRoutes from "./routes/users";
@@ -10,7 +11,12 @@ const PORT = process.env.PORT || 3000;
 
 connectDB();
 
+// Enable CORS
+app.use(cors());
+
+// Body parser middleware to parse JSON
 app.use(express.json());
+
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
