@@ -1,13 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// Enum for post types
-export enum PostType {
-  BLOG = "blog",
-  ARTICLE = "article",
-  TUTORIAL = "tutorial",
-  REVIEW = "review",
-}
-
 // Enum for post statuses
 export enum PostStatus {
   DRAFT = "draft",
@@ -23,7 +15,7 @@ export interface IPost extends Document {
   title: string; // Title of the post
   description: string; // Short description of the post
   content: string; // Main content of the post
-  type: PostType; // Type of the post (blog, article, etc.)
+  type: mongoose.Schema.Types.ObjectId; // Type of the post (blog, article, etc.)
   collaborators: mongoose.Schema.Types.ObjectId[]; // Collaborators on the post
   imageUrl: string; // URL of the post image
   status: PostStatus; // Status of the post
@@ -45,7 +37,7 @@ const PostSchema: Schema = new Schema(
     title: { type: String, required: true }, // Title of the post
     description: { type: String, required: true }, // Short description of the post
     content: { type: String, required: true }, // Main content of the post
-    type: { type: String, enum: Object.values(PostType), required: true }, // Type of the post
+    type: { type: Schema.Types.ObjectId, ref: "PostType", required: true }, // Type of the post
     collaborators: [
       {
         type: Schema.Types.ObjectId,

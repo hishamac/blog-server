@@ -3,6 +3,10 @@ import Post, { IPost } from '../models/Post';
 // Create a new post
 export const createPost = async (postData: Partial<IPost>): Promise<IPost> => {
   const post = new Post(postData);
+  //upload image to cloudinary
+
+  
+
   return await post.save();
 };
 

@@ -17,15 +17,14 @@ const generateToken = (id: string, role: string): string => {
 export const registerUser = async (
   req: Request,
   res: Response
-): Promise<void> => {
-  const { name, email, password, role } = req.body;
+): Promise<Response> => {
+  const { name, email, password, profilePicture } = req.body;
 
   try {
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(400).json({ message: "User already exists" });
-      return;
+      return res.status(200).json({ message: "User already exists" });
     }
 
     // Create new user
@@ -33,16 +32,17 @@ export const registerUser = async (
       name,
       email,
       password,
-      role,
+      profilePicture,
     });
 
     // Save user to database
     await user.save();
 
     // Return user data
-    res.status(201).json({
+    return res.status(201).json({
       _id: user._id,
       name: user.name,
+      profilePicture: user.profilePicture,
       email: user.email,
       role: user.role,
       likes: user.likes, // Include likes array
@@ -55,12 +55,15 @@ export const registerUser = async (
       token: generateToken(user._id, user.role),
     });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    return res.status(200).json({ message: "Server error" });
   }
 };
 
 // Authenticate user (login)
-export const authUser = async (req: Request, res: Response): Promise<void> => {
+export const authUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { email, password } = req.body;
 
   try {
@@ -69,7 +72,7 @@ export const authUser = async (req: Request, res: Response): Promise<void> => {
 
     if (user && (await user.matchPassword(password))) {
       // Return user data if password matches
-      res.json({
+      return res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
@@ -84,9 +87,9 @@ export const authUser = async (req: Request, res: Response): Promise<void> => {
         token: generateToken(user._id, user.role),
       });
     } else {
-      res.status(401).json({ message: "Invalid email or password" });
+      return res.status(200).json({ message: "Invalid email or password" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    return res.status(200).json({ message: "Server error" });
   }
 };
