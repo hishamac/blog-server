@@ -1,59 +1,174 @@
+import { Request, Response } from "express";
 import Language, { ILanguage, LanguageDirection } from '../models/Language';
-import { Document } from 'mongoose';
 
 // Create a new language
-export const createLanguage = async (name: string, direction: LanguageDirection): Promise<ILanguage> => {
-  const language = new Language({
-    name,
-    direction,
-    posts: []
-  });
+export const createLanguage = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { name, direction } = req.body;
 
-  return await language.save();
+  try {
+    const language = new Language({
+      name,
+      direction,
+      posts: []
+    });
+
+    await language.save();
+
+    return res.status(201).json({
+      _id: language._id,
+      name: language.name,
+      direction: language.direction,
+      posts: language.posts,
+      createdAt: language.createdAt,
+      updatedAt: language.updatedAt
+    });
+  } catch (err) {
+    return res.status(500).json({ 
+      message: "Server error",
+      error: err instanceof Error ? err.message : err
+    });
+  }
 };
 
 // Get all languages
-export const getAllLanguages = async (): Promise<ILanguage[]> => {
-  return await Language.find().sort({ name: 1 });
+export const getAllLanguages = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const languages = await Language.find().sort({ name: 1 });
+    return res.status(200).json(languages);
+  } catch (err) {
+    return res.status(500).json({ 
+      message: "Server error",
+      error: err instanceof Error ? err.message : err
+    });
+  }
 };
 
 // Get a specific language by ID
-export const getLanguageById = async (languageId: string): Promise<ILanguage | null> => {
-  return await Language.findById(languageId);
+export const getLanguageById = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { languageId } = req.params;
+
+  try {
+    const language = await Language.findById(languageId);
+    if (language) {
+      return res.status(200).json(language);
+    } else {
+      return res.status(404).json({ message: "Language not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ 
+      message: "Server error",
+      error: err instanceof Error ? err.message : err
+    });
+  }
 };
 
 // Update a language
 export const updateLanguage = async (
-  languageId: string, 
-  name: string, 
-  direction: LanguageDirection
-): Promise<ILanguage | null> => {
-  return await Language.findByIdAndUpdate(
-    languageId,
-    { name, direction },
-    { new: true }
-  );
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { languageId } = req.params;
+  const { name, direction } = req.body;
+
+  try {
+    const updatedLanguage = await Language.findByIdAndUpdate(
+      languageId,
+      { name, direction },
+      { new: true }
+    );
+    if (updatedLanguage) {
+      return res.status(200).json(updatedLanguage);
+    } else {
+      return res.status(404).json({ message: "Language not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ 
+      message: "Server error",
+      error: err instanceof Error ? err.message : err
+    });
+  }
 };
 
 // Delete a language
-export const deleteLanguage = async (languageId: string): Promise<Document | null> => {
-  return await Language.findByIdAndDelete(languageId);
+export const deleteLanguage = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { languageId } = req.params;
+
+  try {
+    const deletedLanguage = await Language.findByIdAndDelete(languageId);
+    if (deletedLanguage) {
+      return res.status(200).json({ message: "Language deleted successfully" });
+    } else {
+      return res.status(404).json({ message: "Language not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ 
+      message: "Server error",
+      error: err instanceof Error ? err.message : err
+    });
+  }
 };
 
 // Add a post to a language
-export const addPostToLanguage = async (languageId: string, postId: string): Promise<ILanguage | null> => {
-  return await Language.findByIdAndUpdate(
-    languageId,
-    { $addToSet: { posts: postId } },
-    { new: true }
-  );
+export const addPostToLanguage = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { languageId } = req.params;
+  const { postId } = req.body;
+
+  try {
+    const updatedLanguage = await Language.findByIdAndUpdate(
+      languageId,
+      { $addToSet: { posts: postId } },
+      { new: true }
+    );
+    if (updatedLanguage) {
+      return res.status(200).json(updatedLanguage);
+    } else {
+      return res.status(404).json({ message: "Language not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ 
+      message: "Server error",
+      error: err instanceof Error ? err.message : err
+    });
+  }
 };
 
 // Remove a post from a language
-export const removePostFromLanguage = async (languageId: string, postId: string): Promise<ILanguage | null> => {
-  return await Language.findByIdAndUpdate(
-    languageId,
-    { $pull: { posts: postId } },
-    { new: true }
-  );
+export const removePostFromLanguage = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { languageId, postId } = req.params;
+
+  try {
+    const updatedLanguage = await Language.findByIdAndUpdate(
+      languageId,
+      { $pull: { posts: postId } },
+      { new: true }
+    );
+    if (updatedLanguage) {
+      return res.status(200).json(updatedLanguage);
+    } else {
+      return res.status(404).json({ message: "Language or post not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ 
+      message: "Server error",
+      error: err instanceof Error ? err.message : err
+    });
+  }
 };

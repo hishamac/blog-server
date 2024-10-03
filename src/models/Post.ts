@@ -21,6 +21,7 @@ export interface IPost extends Document {
   status: PostStatus; // Status of the post
   createdAt: Date; // Timestamp for creation
   updatedAt: Date; // Timestamp for updates
+  isActive: boolean; // Custom field for post activity status
 }
 
 // Define the Post Schema
@@ -50,6 +51,7 @@ const PostSchema: Schema = new Schema(
       default: PostStatus.DRAFT, // Default value
     },
     imageUrl: { type: String }, // URL of the post image
+    isActive: { type: Boolean, default: true, required: true }, // Custom field for post activity status
   },
   { timestamps: true } // Automatically adds createdAt and updatedAt fields
 );
