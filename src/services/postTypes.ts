@@ -12,7 +12,7 @@ export const createPostType = async (
     await postType.save();
     return res.status(201).json(postType);
   } catch (err) {
-    return res.status(500).json({
+    return res.status(200).json({
       message: "Error creating post type",
       error: err instanceof Error ? err.message : err,
     });
@@ -26,9 +26,9 @@ export const getAllPostTypes = async (
 ): Promise<Response> => {
   try {
     const postTypes = await PostType.find().sort({ name: 1 });
-    return res.status(200).json(postTypes);
+    return res.status(201).json(postTypes);
   } catch (err) {
-    return res.status(500).json({
+    return res.status(200).json({
       message: "Error fetching post types",
       error: err instanceof Error ? err.message : err,
     });
@@ -43,12 +43,12 @@ export const getPostTypeById = async (
   try {
     const postType = await PostType.findById(req.params.postTypeId);
     if (postType) {
-      return res.status(200).json(postType);
+      return res.status(201).json(postType);
     } else {
-      return res.status(404).json({ message: "Post type not found" });
+      return res.status(200).json({ message: "Post type not found" });
     }
   } catch (err) {
-    return res.status(500).json({
+    return res.status(200).json({
       message: "Error fetching post type",
       error: err instanceof Error ? err.message : err,
     });
@@ -68,12 +68,12 @@ export const updatePostType = async (
       { new: true }
     );
     if (updatedPostType) {
-      return res.status(200).json(updatedPostType);
+      return res.status(201).json(updatedPostType);
     } else {
-      return res.status(404).json({ message: "Post type not found" });
+      return res.status(200).json({ message: "Post type not found" });
     }
   } catch (err) {
-    return res.status(500).json({
+    return res.status(200).json({
       message: "Error updating post type",
       error: err instanceof Error ? err.message : err,
     });
@@ -91,13 +91,13 @@ export const deletePostType = async (
     );
     if (deletedPostType) {
       return res
-        .status(200)
+        .status(201)
         .json({ message: "Post type deleted successfully" });
     } else {
-      return res.status(404).json({ message: "Post type not found" });
+      return res.status(200).json({ message: "Post type not found" });
     }
   } catch (err) {
-    return res.status(500).json({
+    return res.status(200).json({
       message: "Error deleting post type",
       error: err instanceof Error ? err.message : err,
     });
@@ -117,12 +117,12 @@ export const addPostToPostType = async (
       { new: true }
     );
     if (updatedPostType) {
-      return res.status(200).json(updatedPostType);
+      return res.status(201).json(updatedPostType);
     } else {
-      return res.status(404).json({ message: "Post type not found" });
+      return res.status(200).json({ message: "Post type not found" });
     }
   } catch (err) {
-    return res.status(500).json({
+    return res.status(200).json({
       message: "Error adding post to post type",
       error: err instanceof Error ? err.message : err,
     });
@@ -141,12 +141,12 @@ export const removePostFromPostType = async (
       { new: true }
     );
     if (updatedPostType) {
-      return res.status(200).json(updatedPostType);
+      return res.status(201).json(updatedPostType);
     } else {
-      return res.status(404).json({ message: "Post type or post not found" });
+      return res.status(200).json({ message: "Post type or post not found" });
     }
   } catch (err) {
-    return res.status(500).json({
+    return res.status(200).json({
       message: "Error removing post from post type",
       error: err instanceof Error ? err.message : err,
     });

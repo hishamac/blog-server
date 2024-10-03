@@ -21,7 +21,7 @@ export const createNotification = async (
 
     return res.status(201).json(notification);
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({ 
       message: "Server error",
       error: err instanceof Error ? err.message : err
     });
@@ -37,9 +37,9 @@ export const getUserNotifications = async (
 
   try {
     const notifications = await Notification.find({ recipients: userId }).sort({ createdAt: -1 });
-    return res.status(200).json(notifications);
+    return res.status(201).json(notifications);
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({ 
       message: "Server error",
       error: err instanceof Error ? err.message : err
     });
@@ -61,12 +61,12 @@ export const markAsRead = async (
       { new: true }
     );
     if (updatedNotification) {
-      return res.status(200).json(updatedNotification);
+      return res.status(201).json(updatedNotification);
     } else {
-      return res.status(404).json({ message: "Notification not found or user not a recipient" });
+      return res.status(200).json({ message: "Notification not found or user not a recipient" });
     }
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({ 
       message: "Server error",
       error: err instanceof Error ? err.message : err
     });
@@ -85,9 +85,9 @@ export const markAllAsRead = async (
       { recipients: userId, read: false },
       { read: true }
     );
-    return res.status(200).json(result);
+    return res.status(201).json(result);
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({ 
       message: "Server error",
       error: err instanceof Error ? err.message : err
     });
@@ -104,12 +104,12 @@ export const deleteNotification = async (
   try {
     const deletedNotification = await Notification.findByIdAndDelete(notificationId);
     if (deletedNotification) {
-      return res.status(200).json({ message: "Notification deleted successfully" });
+      return res.status(201).json({ message: "Notification deleted successfully" });
     } else {
-      return res.status(404).json({ message: "Notification not found" });
+      return res.status(200).json({ message: "Notification not found" });
     }
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({ 
       message: "Server error",
       error: err instanceof Error ? err.message : err
     });

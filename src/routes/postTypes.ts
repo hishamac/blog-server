@@ -12,9 +12,10 @@ import { protect, blogger } from "../middlewares/authMiddleware";
 
 const router = Router();
 
+router.get("/", getAllPostTypes);
+router.get("/:postTypeId", getPostTypeById);
+
 router.post("/", protect, blogger, createPostType);
-router.get("/", protect, getAllPostTypes);
-router.get("/:postTypeId", protect, getPostTypeById);
 router.put("/:postTypeId", protect, blogger, updatePostType);
 router.delete("/:postTypeId", protect, blogger, deletePostType);
 router.post("/:postTypeId/posts", protect, blogger, addPostToPostType);

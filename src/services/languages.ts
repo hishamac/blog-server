@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Language, { ILanguage, LanguageDirection } from '../models/Language';
+import Language, { ILanguage, LanguageDirection } from "../models/Language";
 
 // Create a new language
 export const createLanguage = async (
@@ -12,7 +12,7 @@ export const createLanguage = async (
     const language = new Language({
       name,
       direction,
-      posts: []
+      posts: [],
     });
 
     await language.save();
@@ -23,12 +23,12 @@ export const createLanguage = async (
       direction: language.direction,
       posts: language.posts,
       createdAt: language.createdAt,
-      updatedAt: language.updatedAt
+      updatedAt: language.updatedAt,
     });
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({
       message: "Server error",
-      error: err instanceof Error ? err.message : err
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
@@ -40,11 +40,11 @@ export const getAllLanguages = async (
 ): Promise<Response> => {
   try {
     const languages = await Language.find().sort({ name: 1 });
-    return res.status(200).json(languages);
+    return res.status(201).json(languages);
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({
       message: "Server error",
-      error: err instanceof Error ? err.message : err
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
@@ -59,14 +59,14 @@ export const getLanguageById = async (
   try {
     const language = await Language.findById(languageId);
     if (language) {
-      return res.status(200).json(language);
+      return res.status(201).json(language);
     } else {
-      return res.status(404).json({ message: "Language not found" });
+      return res.status(200).json({ message: "Language not found" });
     }
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({
       message: "Server error",
-      error: err instanceof Error ? err.message : err
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
@@ -86,14 +86,14 @@ export const updateLanguage = async (
       { new: true }
     );
     if (updatedLanguage) {
-      return res.status(200).json(updatedLanguage);
+      return res.status(201).json(updatedLanguage);
     } else {
-      return res.status(404).json({ message: "Language not found" });
+      return res.status(200).json({ message: "Language not found" });
     }
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({
       message: "Server error",
-      error: err instanceof Error ? err.message : err
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
@@ -108,14 +108,14 @@ export const deleteLanguage = async (
   try {
     const deletedLanguage = await Language.findByIdAndDelete(languageId);
     if (deletedLanguage) {
-      return res.status(200).json({ message: "Language deleted successfully" });
+      return res.status(201).json({ message: "Language deleted successfully" });
     } else {
-      return res.status(404).json({ message: "Language not found" });
+      return res.status(200).json({ message: "Language not found" });
     }
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({
       message: "Server error",
-      error: err instanceof Error ? err.message : err
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
@@ -135,14 +135,14 @@ export const addPostToLanguage = async (
       { new: true }
     );
     if (updatedLanguage) {
-      return res.status(200).json(updatedLanguage);
+      return res.status(201).json(updatedLanguage);
     } else {
-      return res.status(404).json({ message: "Language not found" });
+      return res.status(200).json({ message: "Language not found" });
     }
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(200).json({
       message: "Server error",
-      error: err instanceof Error ? err.message : err
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
@@ -161,14 +161,14 @@ export const removePostFromLanguage = async (
       { new: true }
     );
     if (updatedLanguage) {
-      return res.status(200).json(updatedLanguage);
+      return res.status(201).json(updatedLanguage);
     } else {
-      return res.status(404).json({ message: "Language or post not found" });
+      return res.status(200).json({ message: "Language or post not found" });
     }
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: "Server error",
-      error: err instanceof Error ? err.message : err
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
