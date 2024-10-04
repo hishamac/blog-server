@@ -8,7 +8,7 @@ export const createPost = async (req: Request, res: Response): Promise<Response>
     // TODO: Upload image to cloudinary
     await post.save();
     return res.status(201).json(post);
-  } catch (err) {
+  } catch (err) {         
     return res.status(200).json({ 
       message: "Error creating post",
       error: err instanceof Error ? err.message : err
