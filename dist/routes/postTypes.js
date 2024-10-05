@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const postTypes_1 = require("../services/postTypes");
+const authMiddleware_1 = require("../middlewares/authMiddleware");
+const router = (0, express_1.Router)();
+router.get("/", postTypes_1.getAllPostTypes);
+router.get("/:postTypeId", postTypes_1.getPostTypeById);
+router.post("/", authMiddleware_1.protect, authMiddleware_1.blogger, postTypes_1.createPostType);
+router.put("/:postTypeId", authMiddleware_1.protect, authMiddleware_1.blogger, postTypes_1.updatePostType);
+router.delete("/:postTypeId", authMiddleware_1.protect, authMiddleware_1.blogger, postTypes_1.deletePostType);
+router.post("/:postTypeId/posts", authMiddleware_1.protect, authMiddleware_1.blogger, postTypes_1.addPostToPostType);
+router.delete("/:postTypeId/posts/:postId", authMiddleware_1.protect, authMiddleware_1.blogger, postTypes_1.removePostFromPostType);
+exports.default = router;
