@@ -93,3 +93,80 @@ export const authUser = async (
     return res.status(200).json({ message: "Server error" });
   }
 };
+
+export const getAllUsers = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const bloggers = await User.find({ role: "blogger" }).populate("posts");
+    return res.status(201).json(bloggers);
+  } catch (err) {
+    return res.status(200).json({
+      message: "Error fetching bloggers",
+      error: err instanceof Error ? err.message : err,
+    });
+  }
+};
+
+// Get a single blogger by ID
+export const getUserById = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const blogger = await User.findById(req.params.id).populate("posts");
+    if (blogger) {
+      return res.status(201).json(blogger);
+    } else {
+      return res.status(200).json({ message: "User not found" });
+    }
+  } catch (err) {
+    return res.status(200).json({
+      message: "Error fetching blogger",
+      error: err instanceof Error ? err.message : err,
+    });
+  }
+};
+
+// Update a blogger by ID
+export const updateUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    }).populate("posts");
+    if (updatedUser) {
+      return res.status(201).json(updatedUser);
+    } else {
+      return res.status(200).json({ message: "User not found" });
+    }
+  } catch (err) {
+    return res.status(200).json({
+      message: "Error updating blogger",
+      error: err instanceof Error ? err.message : err,
+    });
+  }
+};
+
+// Delete a blogger by ID
+export const deleteUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    if (deletedUser) {
+      return res.status(201).json({ message: "User deleted successfully" });
+    } else {
+      return res.status(200).json({ message: "User not found" });
+    }
+  } catch (err) {
+    return res.status(200).json({
+      message: "Error deleting blogger",
+      error: err instanceof Error ? err.message : err,
+    });
+  }
+};

@@ -19,6 +19,7 @@ export interface IUser extends Document {
   followers: mongoose.Schema.Types.ObjectId[]; // Array of User IDs following this user
   following: mongoose.Schema.Types.ObjectId[]; // Array of User IDs this user is following
   notifications: mongoose.Schema.Types.ObjectId[]; // Array of notifications
+  likedPosts: mongoose.Schema.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
   matchPassword(enteredPassword: string): Promise<boolean>;
@@ -40,6 +41,7 @@ const UserSchema: Schema = new Schema(
       type: Number,
       default: 0, // Initialize likes to 0
     },
+    likedPosts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
     posts: [{ type: Schema.Types.ObjectId, ref: "Post" }], // Reference to posts created by the user
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }], // Reference to users following this user
     following: [{ type: Schema.Types.ObjectId, ref: "User" }], // Reference to users this user is following
