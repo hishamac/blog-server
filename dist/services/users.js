@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.updateUser = exports.getUserById = exports.getAllUsers = exports.authUser = exports.registerUser = void 0;
+exports.unfollowUser = exports.followUser = exports.deleteUser = exports.updateUser = exports.getUserById = exports.getAllUsers = exports.authUser = exports.registerUser = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const User_1 = __importDefault(require("../models/User"));
 dotenv_1.default.config();
@@ -97,7 +98,9 @@ const authUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.authUser = authUser;
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const bloggers = yield User_1.default.find({ role: "blogger" }).populate("posts");
+        const bloggers = yield User_1.default.find({
+            role: "blogger",
+        }).populate("posts");
         return res.status(201).json(bloggers);
     }
     catch (err) {
@@ -130,6 +133,7 @@ exports.getUserById = getUserById;
 // Update a blogger by ID
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        req.body.password = yield bcryptjs_1.default.hash(req.body.password, yield bcryptjs_1.default.genSalt(10));
         const updatedUser = yield User_1.default.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
         }).populate("posts");
@@ -167,3 +171,59 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.deleteUser = deleteUser;
+const followUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield User_1.default.findById(req.params.id);
+        const currentUser = yield User_1.default.findById(req.body.currentUserId);
+        // Check if the current user is already following the target user
+        if ((user === null || user === void 0 ? void 0 : user.followers.includes(currentUser === null || currentUser === void 0 ? void 0 : currentUser._id)) ||
+            (currentUser === null || currentUser === void 0 ? void 0 : currentUser.following.includes(user === null || user === void 0 ? void 0 : user._id))) {
+            return res.status(200).json({ message: "Already following user" });
+        }
+        yield User_1.default.findByIdAndUpdate(user === null || user === void 0 ? void 0 : user._id, {
+            $push: { followers: currentUser === null || currentUser === void 0 ? void 0 : currentUser._id },
+        });
+        // Add the target user's ID to the current user's following array
+        yield User_1.default.findByIdAndUpdate(currentUser === null || currentUser === void 0 ? void 0 : currentUser._id, {
+            $push: { following: user === null || user === void 0 ? void 0 : user._id },
+        });
+        yield (user === null || user === void 0 ? void 0 : user.save());
+        yield (currentUser === null || currentUser === void 0 ? void 0 : currentUser.save());
+        return res.status(201).json({ message: `Followed user Successfully` });
+    }
+    catch (err) {
+        return res.status(200).json({
+            message: "Error following user",
+            error: err instanceof Error ? err.message : err,
+        });
+    }
+});
+exports.followUser = followUser;
+const unfollowUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield User_1.default.findById(req.params.id);
+        const currentUser = yield User_1.default.findById(req.body.currentUserId);
+        // Check if the current user is following the target user
+        if (!(user === null || user === void 0 ? void 0 : user.followers.includes(currentUser === null || currentUser === void 0 ? void 0 : currentUser._id)) ||
+            !(currentUser === null || currentUser === void 0 ? void 0 : currentUser.following.includes(user === null || user === void 0 ? void 0 : user._id))) {
+            return res.status(200).json({ message: "User Already not followed" });
+        }
+        yield User_1.default.findByIdAndUpdate(user === null || user === void 0 ? void 0 : user._id, {
+            $pull: { followers: currentUser._id },
+        });
+        // Remove the target user's ID from the current user's following array
+        yield User_1.default.findByIdAndUpdate(currentUser._id, {
+            $pull: { following: user === null || user === void 0 ? void 0 : user._id },
+        });
+        yield (user === null || user === void 0 ? void 0 : user.save());
+        yield (currentUser === null || currentUser === void 0 ? void 0 : currentUser.save());
+        return res.status(201).json({ message: "Unfollowed user successfully" });
+    }
+    catch (err) {
+        return res.status(200).json({
+            message: "Error unfollowing user",
+            error: err instanceof Error ? err.message : err,
+        });
+    }
+});
+exports.unfollowUser = unfollowUser;

@@ -99,7 +99,9 @@ export const getAllUsers = async (
   res: Response
 ): Promise<Response> => {
   try {
-    const bloggers = await User.find({ role: "blogger" }).populate("posts");
+    const bloggers = await User.find({
+      role: "blogger",
+    }).populate("posts");
     return res.status(201).json(bloggers);
   } catch (err) {
     return res.status(200).json({
@@ -135,9 +137,14 @@ export const updateUser = async (
   res: Response
 ): Promise<Response> => {
   try {
+    req.body.password = await bcrypt.hash(
+      req.body.password,
+      await bcrypt.genSalt(10)
+    );
     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     }).populate("posts");
+
     if (updatedUser) {
       return res.status(201).json(updatedUser);
     } else {
@@ -166,6 +173,80 @@ export const deleteUser = async (
   } catch (err) {
     return res.status(200).json({
       message: "Error deleting blogger",
+      error: err instanceof Error ? err.message : err,
+    });
+  }
+};
+
+export const followUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const user = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.body.currentUserId);
+
+    // Check if the current user is already following the target user
+    if (
+      user?.followers.includes(currentUser?._id) ||
+      currentUser?.following.includes(user?._id)
+    ) {
+      return res.status(200).json({ message: "Already following user" });
+    }
+
+    await User.findByIdAndUpdate(user?._id, {
+      $push: { followers: currentUser?._id },
+    });
+
+    // Add the target user's ID to the current user's following array
+    await User.findByIdAndUpdate(currentUser?._id, {
+      $push: { following: user?._id },
+    });
+
+    await user?.save();
+    await currentUser?.save();
+
+    return res.status(201).json({ message: `Followed user Successfully` });
+  } catch (err) {
+    return res.status(200).json({
+      message: "Error following user",
+      error: err instanceof Error ? err.message : err,
+    });
+  }
+};
+
+export const unfollowUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const user = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.body.currentUserId);
+
+    // Check if the current user is following the target user
+    if (
+      !user?.followers.includes(currentUser?._id) ||
+      !currentUser?.following.includes(user?._id)
+    ) {
+      return res.status(200).json({ message: "User Already not followed" });
+    }
+
+    await User.findByIdAndUpdate(user?._id, {
+      $pull: { followers: currentUser._id },
+    });
+
+    // Remove the target user's ID from the current user's following array
+    await User.findByIdAndUpdate(currentUser._id, {
+      $pull: { following: user?._id },
+    });
+
+    await user?.save();
+    await currentUser?.save();
+
+    return res.status(201).json({ message: "Unfollowed user successfully" });
+  } catch (err) {
+    return res.status(200).json({
+      message: "Error unfollowing user",
       error: err instanceof Error ? err.message : err,
     });
   }

@@ -9,6 +9,8 @@ router.get("/", users_1.getAllUsers);
 router.get("/:id", users_1.getUserById);
 router.post("/register", users_1.registerUser);
 router.post("/login", users_1.authUser);
+router.post("/follow/:id", authMiddleware_1.protect, authMiddleware_1.blogger, users_1.followUser);
+router.post("/unfollow/:id", authMiddleware_1.protect, authMiddleware_1.blogger, users_1.unfollowUser);
 router.put("/:id", authMiddleware_1.protect, authMiddleware_1.blogger, users_1.updateUser);
 router.delete("/:id", authMiddleware_1.protect, authMiddleware_1.blogger, users_1.deleteUser);
 exports.default = router;
